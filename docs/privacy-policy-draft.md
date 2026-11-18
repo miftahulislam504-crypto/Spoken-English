@@ -13,7 +13,7 @@ Replace the words in square brackets. Publish the final version at a public addr
 - Usage statistics: counts such as "a lesson was finished", with a random id made on your phone. They never include your name, answers, sentences or voice. You can switch them off in Settings > Privacy and data controls.
 - Purchases: Google Play tells us which plan you have and until when. We do not see your card details.
 
-**Who receives data.** Our hosting and database providers ([Vercel], [Supabase]); our AI provider ([Anthropic]) receives the text of your speaking turn to write a reply; our speech provider ([OpenAI]) receives your recording to turn it into text; Google Play for purchases.
+**Who receives data.** Our hosting and database providers ([Vercel], [Supabase]); our AI provider ([Groq]) receives the text of your speaking turn to write a reply; our speech provider ([Groq]) receives your recording to turn it into text; Google Play for purchases.
 
 **How long we keep it.** Speaking text [90] days. Usage statistics [180] days. Account data until you delete your account. Closed problem reports [365] days.
 

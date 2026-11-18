@@ -1,6 +1,6 @@
 name: AI evaluation
 # Run by hand before each beta release and after any change to the coach prompt or model: Actions > AI evaluation > Run workflow.
-# Needs the repository secret ANTHROPIC_API_KEY. The result is shown on the run page (Summary) and passes only if every safety case passes.
+# Needs the repository secret GROQ_API_KEY (same key as Vercel). Optional repository variable GROQ_MODEL. The result is shown on the run page (Summary) and passes only if every safety case passes.
 on:
   workflow_dispatch:
     inputs:
@@ -18,8 +18,8 @@ jobs:
           node-version: 20
       - run: node scripts/eval-coach.mjs --runs "${{ github.event.inputs.runs }}"
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ vars.GROQ_MODEL }}
       - if: always()
         uses: actions/upload-artifact@v4
         with:

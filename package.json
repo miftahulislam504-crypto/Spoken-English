@@ -15,7 +15,7 @@
   },
   "scripts": {
     "export:content": "node scripts/export-content.mjs",
-    "test": "node --test tests/engine.test.mjs tests/app.test.mjs tests/speak.test.mjs tests/api.test.mjs tests/i18n.test.mjs tests/billing.test.mjs tests/plans.test.mjs tests/admin.test.mjs tests/adminui.test.mjs tests/privacy.test.mjs tests/phase11.test.mjs tests/main.test.mjs tests/a11y.test.mjs tests/perf.test.mjs tests/aieval.test.mjs tests/security.test.mjs tests/docs.test.mjs tests/schema.test.mjs",
+    "test": "node --test tests/engine.test.mjs tests/app.test.mjs tests/speak.test.mjs tests/api.test.mjs tests/i18n.test.mjs tests/billing.test.mjs tests/plans.test.mjs tests/admin.test.mjs tests/adminui.test.mjs tests/privacy.test.mjs tests/phase11.test.mjs tests/groq.test.mjs tests/main.test.mjs tests/a11y.test.mjs tests/perf.test.mjs tests/aieval.test.mjs tests/security.test.mjs tests/docs.test.mjs tests/schema.test.mjs",
     "eval:coach": "node scripts/eval-coach.mjs"
   }
 }

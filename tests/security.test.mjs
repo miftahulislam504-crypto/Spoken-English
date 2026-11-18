@@ -67,7 +67,7 @@ test('the nightly job is scheduled, points at a real route, and the secret names
 test('no secret is in the code that ships, and keys are read only on the server', () => {
   const files = walk(root).filter((f) => /\.(js|mjs|html|json|yml|md|sql)$/.test(f) && !f.includes('package-lock'));
   files.forEach((f) => { const s = readFileSync(f, 'utf8'); assert.doesNotMatch(s, /sk-ant-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{30,}|eyJ[A-Za-z0-9_-]{30,}\.[A-Za-z0-9_-]{20,}/, `${f}: looks like a real key`); });
-  walk(join(root, 'www')).filter((f) => f.endsWith('.js')).forEach((f) => assert.doesNotMatch(readFileSync(f, 'utf8'), /SERVICE_ROLE|ANTHROPIC_API_KEY|OPS_TOKEN|CRON_SECRET|OPENAI_API_KEY/, `${f}: server secret named in browser code`));
+  walk(join(root, 'www')).filter((f) => f.endsWith('.js')).forEach((f) => assert.doesNotMatch(readFileSync(f, 'utf8'), /SERVICE_ROLE|ANTHROPIC_API_KEY|GROQ_API_KEY|OPS_TOKEN|CRON_SECRET|OPENAI_API_KEY/, `${f}: server secret named in browser code`));
   assert.equal(existsSync(join(root, '.env')), false); assert.match(read('.gitignore'), /\.env/);
 });
 

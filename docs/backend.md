@@ -77,8 +77,8 @@ Codes: `unauthenticated` 401, `forbidden` 403, `not_found` 404, `method_not_allo
 
 ## Phase 7 additions (AI speaking)
 Run `supabase/migrations/0004_speaking.sql` after the earlier files. Add these Vercel environment variables:
-- `ANTHROPIC_API_KEY` for the AI coach. Optional: `ANTHROPIC_MODEL` (default `claude-haiku-5-5`).
-- `OPENAI_API_KEY` for voice to text. Optional: `STT_MODEL` (default `whisper-1`). Without it the coach still works when the learner types.
+- `GROQ_API_KEY` for the AI coach and for voice to text (one key for both; steps in `docs/groq-setup.md`). Optional: `GROQ_MODEL` (default `openai/gpt-oss-120b`) and `STT_MODEL` (default `whisper-large-v3-turbo`). If the key is missing the coach is unavailable; typing practice that does not need AI keeps working.
+- Older alternative: when `GROQ_API_KEY` is not set, `ANTHROPIC_API_KEY` (coach, optional `ANTHROPIC_MODEL`, default `claude-haiku-5-5`) and `OPENAI_API_KEY` (voice to text, `STT_MODEL` default `whisper-1`) are used. `GROQ_API_KEY` wins when set.
 - Plan limits come from the `plans` table since Phase 9. `AI_TURNS_PER_DAY`, if set, is a ceiling for every plan. All Phase 9 variables are in `docs/billing-and-limits.md`.
 
 | Method and path | Purpose |

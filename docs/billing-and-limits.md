@@ -32,7 +32,7 @@ Changes apply within a minute. A missing or wrong value falls back to the starti
 | `GOOGLE_PLAY_PACKAGE_NAME` | purchases | Optional. Default `com.spokenenglish.coach` (the appId in capacitor.config.json) |
 | `PLAY_WEBHOOK_SECRET` | notifications | A long random text you make up. It goes in the notification address (step 5) |
 | `OPS_TOKEN` | your usage summary | A long random text. Whoever has it can read the summary |
-| `AI_PRICE_INPUT_PER_MTOK`, `AI_PRICE_OUTPUT_PER_MTOK` | cost estimates | Dollars per million tokens, from your AI provider's price page |
+| `AI_PRICE_INPUT_PER_MTOK`, `AI_PRICE_OUTPUT_PER_MTOK` | cost estimates | Dollars per million tokens, from your AI provider's price page (values for Groq in `docs/groq-setup.md`) |
 | `STT_PRICE_PER_MINUTE` | cost estimates | Dollars per minute of speech recognition |
 | `AI_DAILY_BUDGET_USD`, `AI_MONTHLY_BUDGET_USD` | budgets | Optional. They can also be set in the database (see Budgets) |
 | `QUOTA_TZ_OFFSET_MINUTES` | day reset | Optional. Default 360 |

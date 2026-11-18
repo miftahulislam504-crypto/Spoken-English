@@ -8,7 +8,7 @@ Each correction is stored as one mistake record with the key `sp:` plus the corr
 2. The learner taps the microphone (the app asks permission first). Up to 30 seconds are recorded in memory. Typing is always available.
 3. The server sends the recording to the speech-to-text provider for this one request. The recording is never stored by us. If nothing is heard, the turn is not charged.
 4. Before an AI call the server checks the daily turn limit.
-5. The coach (Claude, called from the server only) gets the scenario, the learner level, the last 8 turns and the text. It must answer through a fixed tool schema. The server then checks every field: allowed error types, lengths, Bengali explanation present, original and corrected text actually different. Invalid output is retried once and then reported as unavailable. Nothing invalid reaches the app.
+5. The coach (a Groq model, called from the server only) gets the scenario, the learner level, the last 8 turns and the text. It must answer with one JSON object with fixed fields (with Anthropic as the provider, through a fixed tool schema instead). The server then checks every field: allowed error types, lengths, Bengali explanation present, original and corrected text actually different. Invalid output is retried once and then reported as unavailable. Nothing invalid reaches the app.
 6. The reply is saved with the turn, usage is written to the ledger (idempotent), the correction is added to the learner's mistake record, and the app reads the reply aloud with the phone voice.
 
 ## Tutor policy built into the prompt

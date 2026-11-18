@@ -30,6 +30,7 @@ on conflict (user_id) do update set role = 'owner';
 | --- | --- | --- |
 | `CRON_SECRET` | a long random text (30 or more letters and digits) | Lets Vercel run the nightly clean-up. Without it the clean-up never runs. |
 | `OPS_TOKEN` | already set in Phase 9 | Also works for `/api/v1/ops/health` |
+| `GROQ_API_KEY` | your Groq key (`docs/groq-setup.md`) | AI coach and voice to text. No Anthropic or OpenAI key is needed |
 
 Vercel runs the clean-up once a day, sometime in the hour after 21:00 UTC (about 03:00 in Bangladesh; the free plan only promises the hour). It is in `vercel.json` and runs only on the production deployment. Check it worked next day: open `/admin/`, Overview, line "nightly clean-up" should say OK.
 
@@ -46,8 +47,8 @@ Supabase > Table Editor > `app_settings`. Four rows were added: `retention_analy
 2. Install the APK on a real phone and do the checks in `docs/qa.md` (section "Device checks"), especially reminders and offline use.
 
 ## 8. AI evaluation (before every beta release)
-1. GitHub > Settings > Secrets and variables > Actions > New repository secret: `ANTHROPIC_API_KEY` (same key as Vercel).
-2. Actions > AI evaluation > Run workflow. Open the run, then Summary. It must say PASSED. If a safety case fails, do not release; fix the coach prompt in `api/_lib/ai.js` and run again.
+1. GitHub > Settings > Secrets and variables > Actions > New repository secret: `GROQ_API_KEY` (same key as Vercel; see `docs/groq-setup.md`).
+2. Actions > AI evaluation > Run workflow. Open the run, then Summary. It must say PASSED. If a safety case fails, do not release; fix the coach prompt in `api/_lib/ai.js` (or try a stronger `GROQ_MODEL`) and run again.
 
 ## 9. Release build for testers
 Follow `docs/release.md` (make the upload key once, add 4 secrets, run Release build, upload the .aab to Play Console Internal testing). Then follow `docs/closed-beta.md`.

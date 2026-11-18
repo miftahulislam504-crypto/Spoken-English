@@ -6,7 +6,7 @@ Written to match what the code does today. Anything not true here is a bug; plea
 - A recording is held in memory on the phone while the learner records, sent once to the speech-to-text service through our server, and then discarded. It is never written to the database, never kept in files, and never logged. The only audio-related column is `audio_reference` on speaking turns (from Phase 1). It is never filled by any code and stays empty; a test checks this. It is reserved for a future feature and must not be used without changing this page and the privacy policy.
 - Only the text that speech recognition returns is kept, in the learner's speaking history, and only for signed-in learners.
 - `tests/privacy.test.mjs` proves this: after a spoken turn, no table and no request log contains the recording.
-- The speech-to-text provider (OpenAI) receives the recording to transcribe it. Check their current data retention terms when you write your privacy policy.
+- The speech-to-text provider (Groq, or OpenAI if you chose it) receives the recording to transcribe it. The AI coach provider (Groq, or Anthropic if you chose it) receives the text of the learner's turn. Check their current data retention terms when you write your privacy policy.
 
 ## What is stored, where, for how long
 | Data | Where | Why | How long | How the learner removes it |

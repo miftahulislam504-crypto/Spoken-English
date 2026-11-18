@@ -14,3 +14,4 @@ See `progress.md` for what is done and what remains.
 - Running the app (monitoring, backups, firewall, problems): `docs/runbook.md`. Quality checks and device checks: `docs/qa.md`.
 - Release and closed beta: `docs/release.md`, `docs/closed-beta.md`, `docs/mvp-acceptance.md`. After launch: `docs/roadmap.md`.
 - What to do after Phase 10 and 11, step by step: `docs/phase-10-11-setup.md`.
+- AI coach and voice to text with Groq (one key, models, prices, limits): `docs/groq-setup.md`.

@@ -186,8 +186,10 @@ test('AI operations: switch and budgets are owner-only, need prices, are recorde
   await as('owner', 'PUT', 'admin/ai/settings', { body: { ai_enabled: false } });
   assert.deepEqual(await E.aiAvailable(), { ok: false, reason: 'disabled' });
   await as('owner', 'PUT', 'admin/ai/settings', { body: { ai_enabled: true, daily_usd: null } }); assert.equal((await E.aiAvailable()).ok, true);
-  const info = (await get('viewer', 'admin/ai')).body; assert.equal(info.settings.monthly_usd, 80); assert.equal(info.anthropic_key_set, true); assert.equal(info.prices_configured, true);
+  const info = (await get('viewer', 'admin/ai')).body; assert.equal(info.settings.monthly_usd, 80); assert.equal(info.coach_key_set, true); assert.equal(info.coach_provider, 'anthropic'); assert.equal(info.stt_provider, 'openai'); assert.equal(info.prices_configured, true);
   const s = JSON.stringify(info); assert.ok(!s.includes('"k"') && !s.includes('ops-secret'), 'no key is ever returned');
+  process.env.GROQ_API_KEY = 'gsk_secret_value'; const g = (await get('viewer', 'admin/ai')).body; delete process.env.GROQ_API_KEY;
+  assert.equal(g.coach_provider, 'groq'); assert.equal(g.stt_provider, 'groq'); assert.equal(g.coach_model, 'openai/gpt-oss-120b'); assert.equal(g.stt_model, 'whisper-large-v3-turbo'); assert.ok(!JSON.stringify(g).includes('gsk_secret_value'), 'the Groq key is never returned');
 });
 
 test('plans: limits are edited with strict checks and apply at once', async () => {

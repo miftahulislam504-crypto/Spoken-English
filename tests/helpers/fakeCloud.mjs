@@ -13,8 +13,8 @@ export const PEOPLE = [
 export const db = { plans: [], subscriptions: [], usage_ledger: [], webhook_events: [], billing_accounts: [], app_settings: [], mistake_records: [], review_queue: [], conversation_sessions: [], conversation_turns: [], profiles: [{ id: 'u1', current_level: 'Pre-A1' }, { id: 'u2', current_level: 'A1' }, ...PEOPLE.map((p) => ({ id: p.id, current_level: 'A1', display_name: p.name, daily_goal_minutes: 10, created_at: '2026-10-01T00:00:00.000Z' }))], listening_progress: [], daily_activity: [], skill_assessments: [], admin_roles: [], user_lesson_progress: [], audit_log: [], analytics_events: [], content_revisions: [], feedback_reports: [], saved_words: [], lessons: [], exercises: [], courses: [], auth_users: [], exercise_attempts: [] };
 export const log = [];            // every outgoing request, as "METHOD host/path"
 export const google = { subs: {}, acked: [], tokenCalls: 0, jwtChecks: [] }; // purchase token -> Play subscription resource
-export const ai = { calls: 0, usage: { input_tokens: 1200, output_tokens: 150 }, fail: false };
-export const stt = { calls: 0, text: 'I go to school yesterday', duration: 4 };
+export const ai = { calls: 0, usage: { input_tokens: 1200, output_tokens: 150 }, fail: false, last: null };   // last: the most recent Groq chat request
+export const stt = { calls: 0, text: 'I go to school yesterday', duration: 4, last: null };                       // last: the most recent Groq transcription request
 export const users = { tok1: { id: 'u1', email: 'a@b.c' }, tok2: { id: 'u2', email: 'd@e.f' }, ...Object.fromEntries(PEOPLE.map((p) => [p.tok, { id: p.id, email: p.email }])) };
 export const keys = crypto.generateKeyPairSync('rsa', { modulusLength: 2048 });
 export const SERVICE_ACCOUNT = JSON.stringify({ client_email: 'play@test.iam.gserviceaccount.com', private_key: keys.privateKey.export({ type: 'pkcs8', format: 'pem' }) });
@@ -28,7 +28,7 @@ export function reset() {
   db.app_settings = [{ key: 'ai_enabled', value: true }, { key: 'ai_daily_budget_usd', value: null }, { key: 'ai_monthly_budget_usd', value: null }];
   db.auth_users = PEOPLE.map((p) => ({ id: p.id, email: p.email, created_at: '2026-10-01T00:00:00Z', last_sign_in_at: null }));
   log.length = 0; google.subs = {}; google.acked = []; google.tokenCalls = 0; google.jwtChecks = [];
-  ai.calls = 0; ai.fail = false; ai.usage = { input_tokens: 1200, output_tokens: 150 }; stt.calls = 0; seq = 0;
+  ai.calls = 0; ai.fail = false; ai.last = null; ai.usage = { input_tokens: 1200, output_tokens: 150 }; stt.calls = 0; stt.last = null; seq = 0;
 }
 const cmp = (v, op, want) => {
   const a = v instanceof Date ? v.toISOString() : v;
@@ -85,6 +85,19 @@ export async function fetch(url, opts = {}) {
   if (u.host === 'api.anthropic.com') {
     ai.calls += 1; if (ai.fail) return json({}, 500);
     return json({ content: [{ type: 'tool_use', input: { coach_reply_en: 'Nice! Where do you study?', coach_reply_bn: 'ভালো! কোথায় পড়ো?', understood: true, goal_met: false, suggested_replies: ['At a school.'], feedback: { original_text: 'I go to school yesterday', corrected_text: 'I went to school yesterday.', error_type: 'verb_tense', explanation_bn: 'অতীত কাল: went', alternative_text: '', needs_retry: false } } }], usage: ai.usage });
+  }
+  if (u.host === 'api.groq.com') {
+    const unauthorized = headers.Authorization !== 'Bearer gsk_test';
+    if (u.pathname === '/openai/v1/chat/completions') {
+      ai.calls += 1; ai.last = { headers, body: JSON.parse(opts.body) }; if (unauthorized) return json({ error: {} }, 401); if (ai.fail) return json({ error: {} }, 500);
+      const reply = { coach_reply_en: 'Nice! Where do you study?', coach_reply_bn: 'ভালো! কোথায় পড়ো?', understood: true, goal_met: false, suggested_replies: ['At a school.'], feedback: { original_text: 'I go to school yesterday', corrected_text: 'I went to school yesterday.', error_type: 'verb_tense', explanation_bn: 'অতীত কাল: went', alternative_text: '', needs_retry: false } };
+      return json({ choices: [{ message: { role: 'assistant', content: JSON.stringify(reply) } }], usage: { prompt_tokens: ai.usage.input_tokens, completion_tokens: ai.usage.output_tokens } });
+    }
+    if (u.pathname === '/openai/v1/audio/transcriptions') {
+      stt.calls += 1; stt.last = { headers, form: opts.body }; if (unauthorized) return json({ error: {} }, 401);
+      return json({ text: stt.text, duration: stt.duration, segments: [{ start: 0, end: stt.duration, avg_logprob: -0.1, no_speech_prob: 0.01, text: stt.text }] });
+    }
+    return json({}, 404);
   }
   if (u.host === 'api.openai.com') { stt.calls += 1; return json({ text: stt.text, duration: stt.duration, segments: [{ start: 0, end: stt.duration, avg_logprob: -0.1, no_speech_prob: 0.01, text: stt.text }] }); }
   if (u.pathname.startsWith('/auth/v1/user')) { const t = (headers.Authorization || '').replace('Bearer ', ''); return users[t] ? json(users[t]) : json({}, 401); }

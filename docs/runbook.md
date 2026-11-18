@@ -7,7 +7,7 @@ Open `/admin/` > Overview. Everything should say OK. A line that says ATTENTION 
 - **Vercel**: Project > Settings > Notifications: turn on failed deployments and function error alerts. Project > Logs: filter by "error" to see server errors. Server errors are logged as one line of JSON with an `event` name (for example `content_not_served`, `audit_failed`).
 - **Supabase**: Project Settings > Billing and Usage: turn on usage alerts. Reports > Database: watch size and connections.
 - **Uptime**: any free uptime checker pointed at `https://YOUR-SITE.vercel.app/api/v1/health` (public) every 5 minutes.
-- **Costs**: Overview shows AI cost. Set budgets in the AI tab. Also set a spending limit in the Anthropic and OpenAI dashboards.
+- **Costs**: Overview shows AI cost. Set budgets in the AI tab. Also set a spending limit in the Groq console (`docs/groq-setup.md`).
 
 ## Firewall rules (Vercel > Project > Firewall, about 5 minutes)
 The open routes have their own limits in code, but the code limits work per server instance. Add these Firewall rules as a second layer (rate limit rules, per IP):
@@ -30,7 +30,7 @@ Vercel Cron calls `/api/v1/ops/maintenance` (GET) once a day in the hour after 2
 4. Write the date and result at the bottom of this file. A backup that was never restored is not a backup.
 
 ## Secrets and keys
-- Rotate immediately if leaked: `SUPABASE_SERVICE_ROLE_KEY` (Supabase > API), `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPS_TOKEN`, `CRON_SECRET`, `PLAY_WEBHOOK_SECRET`, Google service account key. Update in Vercel and redeploy.
+- Rotate immediately if leaked: `SUPABASE_SERVICE_ROLE_KEY` (Supabase > API), `GROQ_API_KEY`, `OPS_TOKEN`, `CRON_SECRET`, `PLAY_WEBHOOK_SECRET`, Google service account key. Update in Vercel and redeploy.
 - No secret is ever in the browser code (a test checks this).
 - Only people who need it should have owner. Review Team every month.
 
@@ -38,7 +38,7 @@ Vercel Cron calls `/api/v1/ops/maintenance` (GET) once a day in the hour after 2
 | Problem | First steps |
 | --- | --- |
 | Many learners cannot sign in | Supabase status page; Auth settings; Vercel logs |
-| AI Speak says "not available" | Overview: AI key set? budget reached (AI tab)? Anthropic status |
+| AI Speak says "not available" | Overview: AI key set? budget reached (AI tab)? Groq limits and status; Vercel Logs line `ai_error` (a 404 or 400 may mean the model name changed, see `docs/groq-setup.md`) |
 | Costs jump | AI tab: lower the daily budget or switch AI off; Overview shows which usage type grew |
 | A lesson is wrong | Content: open it, fix or set to draft, add a reason. Phones update within a day |
 | A bad AI correction is reported | Feedback > AI corrections; add the case to `evals/coach-cases.json`; run AI evaluation |

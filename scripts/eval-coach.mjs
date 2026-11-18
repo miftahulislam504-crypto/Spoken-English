@@ -1,11 +1,12 @@
-// Runs the AI Speak evaluation set against the real coach (needs ANTHROPIC_API_KEY). Normally started from GitHub: Actions, "AI evaluation".
+// Runs the AI Speak evaluation set against the real coach (needs GROQ_API_KEY, or ANTHROPIC_API_KEY). Normally started from GitHub: Actions, "AI evaluation".
 // Run: node scripts/eval-coach.mjs [--only category] [--runs 1]
 import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
-import { coachTurn } from '../api/_lib/ai.js';
+import { coachTurn, coachProvider, coachModel } from '../api/_lib/ai.js';
 import { SCENARIOS, QUESTIONS } from '../www/src/content/speaking.js';
 import { gradeCase } from '../evals/grader.mjs';
 
-if (!process.env.ANTHROPIC_API_KEY) { console.error('ANTHROPIC_API_KEY is not set.'); process.exit(2); }
+if (!coachProvider()) { console.error('GROQ_API_KEY is not set.'); process.exit(2); }
+console.log(`Provider: ${coachProvider()}, model: ${coachModel()}`);
 const set = JSON.parse(readFileSync(new URL('../evals/coach-cases.json', import.meta.url), 'utf8'));
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > 0 ? process.argv[i + 1] : d; };
 const only = arg('only', null); const runs = Math.max(1, Number(arg('runs', 1)));
@@ -28,6 +29,6 @@ const ok = rate >= set.pass_rate_required && !safetyFail.length;
 const lines = [`## AI evaluation: ${ok ? 'PASSED' : 'FAILED'}`, '', `Overall: ${pass} of ${results.length} (${Math.round(rate * 100)} percent). Needed: ${Math.round(set.pass_rate_required * 100)} percent, and every safety case must pass.`, '', '| Category | Passed | Total |', '|---|---|---|', ...Object.entries(byCat).map(([k, v]) => `| ${k}${set.safety_categories.includes(k) ? ' (safety)' : ''} | ${v.pass} | ${v.total} |`)];
 const failed = results.filter((r) => !r.pass); if (failed.length) lines.push('', '### Failures', ...failed.map((r) => `- ${r.id}: ${r.failures.join('; ')}${r.reply ? ` (reply: "${r.reply}")` : ''}`));
 console.log('\n' + lines.join('\n'));
-writeFileSync(new URL('../evals/last-run.json', import.meta.url), JSON.stringify({ at: new Date().toISOString(), model: process.env.ANTHROPIC_MODEL || 'claude-haiku-5-5', ok, rate, byCat, results }, null, 2));
+writeFileSync(new URL('../evals/last-run.json', import.meta.url), JSON.stringify({ at: new Date().toISOString(), provider: coachProvider(), model: coachModel(), ok, rate, byCat, results }, null, 2));
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
 process.exit(ok ? 0 : 1);

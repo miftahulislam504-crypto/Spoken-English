@@ -4,6 +4,8 @@ import { rest } from './supabase.js';
 import { bearerIs } from './billing.js';
 import { playConfig } from './play.js';
 import { pricesConfigured } from './cost.js';
+import { coachProvider, coachModel } from './ai.js';
+import { sttProvider, sttModel } from './stt.js';
 
 export const RETENTION_DEFAULTS = { analytics: 180, transcript: 90, webhook: 180, feedback: 365 };
 const KEYS = { analytics: 'retention_analytics_days', transcript: 'retention_transcript_days', webhook: 'retention_webhook_days', feedback: 'retention_feedback_days' };
@@ -36,8 +38,9 @@ export async function healthChecks() {
   try { const r = await rest('GET', 'app_settings?key=eq.maintenance_last_run&select=value', { service: true }); last = r && r[0] ? r[0].value : null; } catch (e) { /* reported below */ }
   const age = last && last.at ? (Date.now() - Date.parse(last.at)) / 3600000 : null;
   add('nightly clean-up', age !== null && age < 36, age === null ? 'has never run (set CRON_SECRET and redeploy)' : `last run ${Math.round(age)} hours ago`);
-  add('AI coach key', !!process.env.ANTHROPIC_API_KEY, process.env.ANTHROPIC_API_KEY ? 'set' : 'ANTHROPIC_API_KEY is missing');
-  add('voice to text key', !!process.env.OPENAI_API_KEY, process.env.OPENAI_API_KEY ? 'set' : 'OPENAI_API_KEY is missing (typing still works)');
+  const cp = coachProvider(); const sp = sttProvider();
+  add('AI coach key', !!cp, cp ? `set (${cp}, model ${coachModel()})` : 'GROQ_API_KEY is missing');
+  add('voice to text key', !!sp, sp ? `set (${sp}, model ${sttModel()})` : 'GROQ_API_KEY is missing (typing still works)');
   add('Google Play billing', !!playConfig(), playConfig() ? 'set' : 'not configured (everyone is on Free)');
   add('cost prices', pricesConfigured(), pricesConfigured() ? 'set' : 'prices are missing, budgets cannot trigger');
   add('allowed origins', !!process.env.ALLOWED_ORIGINS, process.env.ALLOWED_ORIGINS ? 'set' : 'ALLOWED_ORIGINS is not set (only the app defaults are allowed)');

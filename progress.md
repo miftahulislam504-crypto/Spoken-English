@@ -2,7 +2,7 @@
 
 Source plan: spoken_english_learning_app_complete_plan.md (sections 1 to 21).
 Legend: [x] done, [~] partly done, [ ] not started.
-Current phase: Phase 11 complete (Phase 10 and 11 were built together). Next: owner actions in docs/phase-10-11-setup.md, then the closed beta (docs/closed-beta.md).
+Current phase: Phase 11 complete (Phase 10 and 11 were built together), then a provider change: the AI coach and voice to text now run on Groq (see "Change after Phase 11" at the end). Next: owner actions in docs/phase-10-11-setup.md and docs/groq-setup.md, then the closed beta (docs/closed-beta.md).
 
 ## Stack decision
 Static ES-module web app (no build step) in `www/`, wrapped by Capacitor for Android, deployed on Vercel. Backend (Supabase PostgreSQL + Vercel API) arrives in Phase 6.
@@ -103,7 +103,7 @@ Static ES-module web app (no build step) in `www/`, wrapped by Capacitor for And
 - [x] Week 3 scripted roleplay in lesson l23 stays as practice; AI roleplay is in AI Speak
 - [x] Skill evidence, review schedule and recommendations from speaking: added in Phase 8 (speaking level needs the goal reached twice at one level; see docs/learning-engine.md)
 - [~] Plan-based limits: Phase 9 (a simple daily limit is used now)
-- [ ] Owner action: run 0004_speaking.sql; add ANTHROPIC_API_KEY (coach) and OPENAI_API_KEY (voice to text) in Vercel. Without OPENAI_API_KEY typing still works. Guests must sign in to use AI Speak. See docs/ai-speaking.md.
+- [ ] Owner action: run 0004_speaking.sql; add GROQ_API_KEY (coach and voice to text; first built with Anthropic and OpenAI keys, changed to Groq after Phase 11) in Vercel. Without a key typing practice that needs no AI still works. Guests must sign in to use AI Speak. See docs/ai-speaking.md.
 
 ## Phase 8 - Mistakes, revision, personalization, progress [x]
 - [x] Sec 6.8 mistake records: every first-try mistake in lessons, practice and listening, and every AI speaking correction, becomes one record (type, skill, what the learner wrote, the better answer, Bengali explanation, how often it was seen). Repeats are counted, and a resolved mistake that returns is reopened
@@ -197,6 +197,16 @@ Sec 15, 16 Phase 6, 17, 18, 20. The plan sections were not in the zip; scope fol
 - [~] Retention days, the analytics default (on), the beta targets and the roadmap are my placeholders; see docs/roadmap.md "Decisions that need you"
 - [~] Not built: a measured practice timer (estimates stay), Firewall rules in code (they are set in the Vercel dashboard), recorded audio, free trials and yearly plans
 - [ ] Owner actions: all steps of docs/phase-10-11-setup.md; fill the privacy policy; Play Console setup (docs/release.md); closed beta
+
+## Change after Phase 11 - Groq as the AI provider [x]
+- [x] AI coach (item 1) now calls Groq (OpenAI-style chat API, JSON mode, default model `openai/gpt-oss-120b`, set with `GROQ_MODEL`). Same prompt rules, same server checks of every field, same retry and token counting (`api/_lib/ai.js`, `api/_lib/groq.js`)
+- [x] Voice to text (item 2) now calls Groq Whisper (default `whisper-large-v3-turbo`, set with `STT_MODEL`); silence and confidence are read as before (`api/_lib/stt.js`)
+- [x] One key for both: `GROQ_API_KEY` in Vercel (and in GitHub for the AI evaluation). No Anthropic or OpenAI key is needed. If only the old keys are set, the old providers still work; Groq wins when its key is set
+- [x] Health check, admin AI tab, AI evaluation script and workflow, docs and privacy text updated; new guide `docs/groq-setup.md` (steps, models, prices, limits)
+- [x] Tests: 174 before, now 186 (new `tests/groq.test.mjs`, 12 tests), all pass
+- [~] Not run against the real Groq yet. The tests use a pretend Groq reply built from Groq's public documentation. The first real check is Actions > AI evaluation, then one typed and one voice turn in the app
+- [~] The default coach model and the prices are from Groq's pages today; Groq changes model names, so see `docs/groq-setup.md` if AI Speak suddenly says not available
+- [ ] Owner actions: `docs/groq-setup.md` steps 1 to 6
 
 ## Carry-over notes
 - Lesson l23 (scripted roleplay with hints) was kept as practice by decision in Phase 7; AI roleplay lives in AI Speak. Nothing to carry over.

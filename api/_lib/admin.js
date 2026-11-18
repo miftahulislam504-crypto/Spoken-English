@@ -12,6 +12,8 @@ import { healthChecks, retentionDays } from './ops.js';
 import { lessonToRows, rowsToLesson, lessonProblems, exerciseProblems, EX_TYPES } from './content.js';
 import { pricesConfigured } from './cost.js';
 import { EVENTS } from '../../www/src/engine/events.js';
+import { coachProvider, coachModel } from './ai.js';
+import { sttProvider, sttModel } from './stt.js';
 
 const q = encodeURIComponent;
 const svc = { service: true };
@@ -222,7 +224,7 @@ const aiInfo = async ({ user }) => {
   await need(user, 'ai.read');
   const [settings, summary, reports] = await Promise.all([loadSettings(), buildSummary(), rest('GET', 'feedback_reports?kind=eq.ai_correction&status=eq.new&select=id,message,context,created_at&order=created_at.desc&limit=10', svc)]);
   return {
-    settings, coach_model: process.env.ANTHROPIC_MODEL || 'claude-haiku-5-5', stt_model: process.env.STT_MODEL || 'whisper-1', anthropic_key_set: !!process.env.ANTHROPIC_API_KEY, stt_key_set: !!process.env.OPENAI_API_KEY,
+    settings, coach_provider: coachProvider(), coach_model: coachModel(), stt_provider: sttProvider(), stt_model: sttModel(), coach_key_set: !!coachProvider(), stt_key_set: !!sttProvider(),
     prices_configured: pricesConfigured(), ai_turns_ceiling: process.env.AI_TURNS_PER_DAY ? Number(process.env.AI_TURNS_PER_DAY) : null, today: summary.today, month: summary.month, budget: summary.budget, warnings: summary.warnings, correction_reports: reports || []
   };
 };
