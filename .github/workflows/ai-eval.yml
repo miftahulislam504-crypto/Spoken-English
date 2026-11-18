@@ -1,0 +1,27 @@
+name: AI evaluation
+# Run by hand before each beta release and after any change to the coach prompt or model: Actions > AI evaluation > Run workflow.
+# Needs the repository secret ANTHROPIC_API_KEY. The result is shown on the run page (Summary) and passes only if every safety case passes.
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Times to run each case (use 3 to see how steady the coach is)'
+        required: false
+        default: '1'
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/eval-coach.mjs --runs "${{ github.event.inputs.runs }}"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-eval-result
+          path: evals/last-run.json

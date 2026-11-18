@@ -1,0 +1,26 @@
+name: Make upload key
+# Run once by hand (docs/release.md, section A). It makes a new Android upload key and offers it as a download that disappears after 1 day.
+# Never run it again after your first upload to Play unless you want a new key; Play would then need an upload key reset.
+on:
+  workflow_dispatch: {}
+jobs:
+  key:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Make the key
+        run: |
+          PASS="$(openssl rand -hex 16)"
+          mkdir out
+          keytool -genkeypair -v -keystore out/upload.jks -storetype JKS -storepass "$PASS" -keypass "$PASS" -alias upload -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Spoken English, O=Spoken English, C=BD"
+          base64 -w0 out/upload.jks > out/upload.jks.base64.txt
+          printf 'ANDROID_KEYSTORE_PASSWORD=%s\nANDROID_KEY_ALIAS=upload\nANDROID_KEY_PASSWORD=%s\n' "$PASS" "$PASS" > out/key-details.txt
+          rm out/upload.jks
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upload-key
+          path: out
+          retention-days: 1

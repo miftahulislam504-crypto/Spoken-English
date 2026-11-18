@@ -1,0 +1,26 @@
+/* Admin dashboard: reuses the learner app's colours so light and dark themes work the same way. */
+main.admin{max-width:860px;padding-bottom:40px}
+.atabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px;position:sticky;top:0;background:var(--bg);z-index:2}
+.atabs .chip{white-space:nowrap}
+.tbl{overflow-x:auto;margin:0 0 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.tbl table{border-collapse:collapse;width:100%;font-size:.9rem}
+.tbl th,.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{color:var(--muted);font-weight:600;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl button.linkbtn{color:var(--primary);text-decoration:underline;min-height:32px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 16px;margin:0}
+.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-weight:600}
+.fun{display:grid;gap:8px;margin:8px 0}
+.fun .r{display:grid;grid-template-columns:140px 1fr 70px;gap:8px;align-items:center;font-size:.9rem}
+.fun .b{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}.fun .b i{display:block;height:100%;background:var(--primary)}
+.spark{display:flex;align-items:flex-end;gap:2px;height:60px;margin:8px 0}
+.spark i{flex:1;min-width:3px;background:var(--primary);border-radius:2px 2px 0 0}
+.ok{color:var(--primary);font-weight:700}.warn{color:#9c4a00;font-weight:700}
+@media (prefers-color-scheme:dark){.warn{color:#ffb454}}
+.ad-form{display:grid;gap:8px;margin:8px 0}
+.ad-form label{display:grid;gap:4px;font-size:.9rem;color:var(--muted)}
+.ad-form textarea.field{min-height:100px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
+.ad-form .field{min-height:44px;font-size:1rem}
+.pre{white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,monospace;font-size:.8rem;background:var(--soft);border-radius:8px;padding:8px;margin:4px 0;max-height:240px;overflow:auto}
+.row2{display:flex;gap:8px;flex-wrap:wrap}.row2>*{flex:1;min-width:120px}
+.small{font-size:.85rem}

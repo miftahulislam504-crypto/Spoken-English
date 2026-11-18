@@ -1,0 +1,9 @@
+node_modules/
+android/
+*.apk
+*.aab
+*.jks
+*.keystore
+.env
+.env.*
+evals/last-run.json
