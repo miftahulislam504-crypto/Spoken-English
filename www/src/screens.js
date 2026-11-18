@@ -23,7 +23,7 @@ const chips = (key, vals, label, cur) => `<div class="chips">${vals.map((v) => c
 export function pathHtml(s) {
   const p = buildPath(s, currentWeekIndex(s));
   const focus = s.goal ? `<p class="muted">${t('path.focus', { goal: t('ob.goal.' + s.goal) })}</p>` : '';
-  const rows = p.weeks.map((w) => `<li class="row${w.status === 'current' ? ' cur' : ''}"><span class="stack"><strong>${w.title_en}</strong>${w.status === 'current' ? `<small class="muted">${w.topics_en.join(', ')}</small>` : ''}</span><span class="badge">${t('path.' + w.status)}</span></li>`).join('');
+  const rows = p.weeks.map((w) => `<li class="row${w.status === 'current' ? ' cur' : ''}"><span class="stack"><strong>${w.title_en}</strong>${w.status === 'current' ? `<small class="muted">${w.topics_en.join(', ')}</small>` : ''}</span><span class="badge st-${w.status}">${t('path.' + w.status)}</span></li>`).join('');
   return `${focus}<ul class="rows">${rows}</ul>`;
 }
 
@@ -40,21 +40,26 @@ export function home(s) {
   const wk = weekReport(s.daily, now).cur;
   const n = s.level_notice;
   const notice = n ? `<section class="card notice"><h2>${t('lvl.up', { to: t('level.' + n.to) })}</h2><p>${t('lvl.up.body', { from: t('level.' + n.from), to: t('level.' + n.to), pct: n.pct })}</p><button class="btn secondary" data-act="rv-dismiss-level">${t('lvl.dismiss')}</button></section>` : '';
+  const wave = '<span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>';
+  const chev = `<span class="chev" aria-hidden="true">${icon('chevron')}</span>`;
+  const ico = (name, cls = '') => `<span class="ico${cls}" aria-hidden="true">${icon(name)}</span>`;
+  const link = (href, name, title, body) => `<a class="card ico-card" href="${href}">${ico(name)}<span class="ico-t"><h2>${title}</h2><p>${body}</p></span>${chev}</a>`;
+  const full = pct >= 100;
   return header(t('home.greeting'), profileBtn()) + notice + `
   <p class="level">${t('home.level')}: <strong>${t('level.' + s.level)}</strong></p>
-  <a class="next" href="#/speak"><span class="next-title">${t('home.startSpeaking')}</span><span class="next-sub">${t('home.startSpeaking.sub')}</span></a>
-  <a class="card" href="${nxt ? '#/lesson/' + nxt.id : '#/learn'}"><h2>${t('home.continue')}</h2><p>${nxt ? nxt.title_en : t('home.next', { week })}</p></a>
-  <section class="card"><h2>${t('home.dailyGoal')}</h2>
-    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${done}"><i style="width:${pct}%"></i></div>
+  <a class="next" href="#/speak"><span class="next-title">${t('home.startSpeaking')}</span><span class="next-sub">${t('home.startSpeaking.sub')}</span>${wave}<span class="go" aria-hidden="true">${icon('speak')}</span></a>
+  ${link(nxt ? '#/lesson/' + nxt.id : '#/learn', 'learn', t('home.continue'), nxt ? nxt.title_en : t('home.next', { week }))}
+  <section class="card goal"><div class="line"><h2>${t('home.dailyGoal')}</h2>${full ? `<span class="badge win">${t('home.dailyGoal.met')}</span>` : ''}</div>
+    <div class="bar${full ? ' full' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${done}"><i style="width:${pct}%"></i></div>
     <p>${t('home.dailyGoal.value', { done, goal })}</p></section>
-  <a class="card" href="#/review"><h2>${t('home.review')}</h2><p>${due.length ? t(due.length === 1 ? 'home.review.due1' : 'home.review.due', { n: due.length }) : up.length ? t('home.review.next', { when: whenText(up[0].due, now) }) : t('home.review.none')}</p></a>
+  ${link('#/review', 'review', t('home.review'), due.length ? t(due.length === 1 ? 'home.review.due1' : 'home.review.due', { n: due.length }) : up.length ? t('home.review.next', { when: whenText(up[0].due, now) }) : t('home.review.none'))}
   <h2 class="sec">${t('home.recommended')}</h2>${recHtml(rec)}
-  <section class="card"><h2>${t('home.mistake')}</h2><p>${m ? t('home.mistake.item', { user: esc(m.user), expected: esc(m.expected) }) : t('home.mistake.empty')}</p>${s.mistakes.length ? `<a class="back" href="#/mistakes">${t('home.mistake.all')}</a>` : ''}</section>
-  <a class="card" href="#/weekly"><h2>${t('home.weekly')}</h2><p>${wk.active ? t('home.week.line', { days: wk.active, min: minutesOf(wk.sec), lessons: wk.lc }) : t('home.weekly.empty')}</p></a>
-  <section class="card"><h2>${t('home.plan')}</h2><p>${t('home.plan.value')}</p></section>`;
+  <section class="card ico-card">${ico('alert', ' warn')}<span class="ico-t"><h2>${t('home.mistake')}</h2><p>${m ? t('home.mistake.item', { user: esc(m.user), expected: esc(m.expected) }) : t('home.mistake.empty')}</p>${s.mistakes.length ? `<a class="back" href="#/mistakes">${t('home.mistake.all')}</a>` : ''}</span></section>
+  ${link('#/weekly', 'calendar', t('home.weekly'), wk.active ? t('home.week.line', { days: wk.active, min: minutesOf(wk.sec), lessons: wk.lc }) : t('home.weekly.empty'))}
+  <section class="card ico-card">${ico('star')}<span class="ico-t"><h2>${t('home.plan')}</h2><p>${t('home.plan.value')}</p></span></section>`;
 }
 
-const statusBadge = (st) => `<span class="badge">${t('status.' + st)}</span>`;
+const statusBadge = (st) => `<span class="badge st-${st}">${t('status.' + st)}</span>`;
 function lessonRow(l, s) {
   const st = lessonStatus(l, s.lesson_progress);
   if (st === 'locked') {

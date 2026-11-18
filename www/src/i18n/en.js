@@ -13,6 +13,7 @@ export default {
   'home.continue.sub': 'Pick up your next lesson.',
   'home.dailyGoal': 'Daily Goal',
   'home.dailyGoal.value': '{done} of {goal} minutes today',
+  'home.dailyGoal.met': 'Goal reached',
   'home.recommended': 'Recommended for you',
   'home.recommended.empty': 'Finish your first lesson to get a recommendation.',
   'home.mistake': 'Recent mistake to review',

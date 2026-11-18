@@ -8,6 +8,7 @@ import { applyPlacement, nextLesson } from './engine/lessons.js';
 import { speak, canSpeak, requestMic, RATE } from './audio.js';
 import { pathHtml } from './screens.js';
 import { accountForm } from './account.js';
+import { icon } from './icons.js';
 
 const STEPS = ['splash', 'welcome', 'intro', 'auth', 'goal', 'comfort', 'daily', 'mic', 'diag', 'path'];
 const btn = (label, attrs, cls = '') => `<button class="btn ${cls}" ${attrs}>${label}</button>`;
@@ -16,9 +17,10 @@ const bn = (s, k) => (s.bengali_support === 'off' || !BN[k] ? '' : `<p lang="bn"
 const picks = (key, vals, next, label) => vals.map((v) => opt(`data-act="pick" data-key="${key}" data-value="${v}" data-next="${next}"`, label(v))).join('');
 const play = (text) => (canSpeak() ? btn(t('ob.play'), `data-act="play" data-text="${text}"`, 'secondary') : `<p class="card pattern">${text}</p>`);
 
+const mark = `<span class="mark" aria-hidden="true">${icon('speak')}</span>`;
 const VIEWS = {
-  splash: () => `<h1>${t('app.name')}</h1><p>${t('ob.splash.tag')}</p>`,
-  welcome: (s) => `<h1>${t('ob.welcome.title')}</h1><p class="muted">${t('ob.welcome.sub')}</p>${bn(s, 'welcome')}${btn(t('ob.start'), 'data-act="go" data-next="intro"')}`,
+  splash: () => `${mark}<h1>${t('app.name')}</h1><p>${t('ob.splash.tag')}</p>`,
+  welcome: (s) => `${mark}<h1>${t('ob.welcome.title')}</h1><p class="muted">${t('ob.welcome.sub')}</p>${bn(s, 'welcome')}${btn(t('ob.start'), 'data-act="go" data-next="intro"')}`,
   intro: () => [1, 2, 3].map((n) => `<div class="card"><h2>${t(`ob.intro.${n}.t`)}</h2><p>${t(`ob.intro.${n}.p`)}</p></div>`).join('') + btn(t('ob.continue'), 'data-act="go" data-next="auth"'),
   auth: () => `<h1>${t('ob.auth.title')}</h1>${btn(t('ob.auth.signup'), 'data-act="ac-open" data-mode="signup"', 'secondary')}${btn(t('ob.auth.signin'), 'data-act="ac-open" data-mode="signin"', 'secondary')}${btn(t('ob.auth.guest'), 'data-act="go" data-next="goal"')}<p class="muted">${t('ob.auth.note')}</p>`,
   goal: (s) => `<h1>${t('ob.goal.title')}</h1>${bn(s, 'goal')}${picks('goal', ['conversation', 'study', 'work', 'travel', 'interviews'], 'comfort', (v) => t('ob.goal.' + v))}`,

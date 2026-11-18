@@ -3,7 +3,7 @@
   "short_name": "Spoken English",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f4f8fa",
-  "theme_color": "#0b5d7a",
+  "background_color": "#ffffff",
+  "theme_color": "#0f3b8c",
   "lang": "en"
 }

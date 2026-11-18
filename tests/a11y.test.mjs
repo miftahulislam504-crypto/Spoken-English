@@ -1,5 +1,5 @@
 // Accessibility checks (plan section 17): every screen is drawn for a learner and checked for names on controls, labels on fields,
-// headings, language marks for Bengali, colour contrast in both themes, touch target sizes, zoom, motion and focus.
+// headings, language marks for Bengali, colour contrast in the app theme, touch target sizes, zoom, motion and focus.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -67,12 +67,12 @@ test('the bottom navigation is named and marks the current page', () => {
   assert.match(main, /<nav class="tabs" aria-label=/); assert.match(main, /aria-current="page"/); assert.match(main, /<main>/);
 });
 
-// ---- colours: WCAG 2.1 contrast ratios for the colour pairs the app really uses, in both themes ----
+// ---- colours: WCAG 2.1 contrast ratios for the colour pairs the app really uses, in the app theme ----
 const lum = (hex) => { if (hex.length === 4) hex = '#' + [...hex.slice(1)].map((x) => x + x).join(''); const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 const tokens = (block) => Object.fromEntries([...block.matchAll(/--([a-z-]+):(#[0-9a-fA-F]{3,6})\b/g)].map((m) => [m[1], m[2]]));
-const light = tokens(/:root\{([^}]*)\}/.exec(css)[1]); const dark = tokens(/prefers-color-scheme:dark\)\{:root\{([^}]*)\}/.exec(css)[1]);
-for (const [name, th] of [['light', light], ['dark', dark]]) {
+const light = tokens(/:root\{([^}]*)\}/.exec(css)[1]);
+for (const [name, th] of [['light', light]]) {
   test(`colour contrast, ${name} theme: body text, secondary text, links, buttons and badges are readable (4.5 : 1)`, () => {
     const pairs = [['ink', 'bg'], ['ink', 'surface'], ['muted', 'bg'], ['muted', 'surface'], ['primary', 'bg'], ['primary', 'surface'], ['on-primary', 'primary'], ['ink', 'soft'], ['muted', 'soft'], ['primary', 'soft']];
     pairs.forEach(([f, b]) => assert.ok(ratio(th[f], th[b]) >= 4.5, `${name}: ${f} on ${b} is ${ratio(th[f], th[b]).toFixed(2)}`));
@@ -91,7 +91,7 @@ test('touch targets are at least 44 px high', () => {
 
 test('zoom, motion and keyboard focus are respected', () => {
   assert.match(index, /<html lang="en">/); assert.doesNotMatch(index, /user-scalable\s*=\s*no|maximum-scale\s*=\s*1(?!\d)/);
-  assert.match(css, /prefers-reduced-motion:reduce/); assert.match(css, /:focus-visible\{outline:/); assert.match(css, /prefers-color-scheme:dark/);
+  assert.match(css, /prefers-reduced-motion:reduce/); assert.match(css, /:focus-visible\{outline:/); assert.match(css, /color-scheme:light/); assert.doesNotMatch(css, /prefers-color-scheme:dark/, 'the app keeps its white and dark blue look on every phone');
   assert.match(css, /html,body\{[^}]*font:16px/, 'text starts at 16 px and scales with the phone font setting');
   assert.doesNotMatch(css, /font-size:\s*\d+px/, 'font sizes use rem, so they follow the phone font size');
 });

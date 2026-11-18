@@ -58,6 +58,7 @@ function draw(keepScroll) {
   if (!s.onboarded) {
     app.innerHTML = renderOnboarding(s);
     window.scrollTo(0, 0);
+    if (app.classList) app.classList.remove('enter');
     if (s.ob_step === 'splash' && !timer) {
       timer = setTimeout(() => { timer = null; if (getState().ob_step === 'splash') setState({ ob_step: 'welcome' }); }, 1200);
     }
@@ -71,6 +72,7 @@ function draw(keepScroll) {
     app.innerHTML = `<main>${offlineBanner()}${errorBanner()}${screens[r.id](s, r.param)}</main><nav class="tabs" aria-label="${t('nav.label')}">${nav}</nav>`;
   }
   window.scrollTo(0, keepScroll ? y : 0);
+  if (app.classList) app.classList.toggle('enter', !keepScroll); // entrance animation plays when the screen changes, not on every small update
 }
 
 app.addEventListener('click', (e) => {
